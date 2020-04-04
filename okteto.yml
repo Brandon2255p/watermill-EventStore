@@ -1,0 +1,26 @@
+name: watermill-eventstore
+image: okteto/golang:1
+command:
+  - bash
+workdir: /go/src/github.com/brandon2255p/watermill-eventstore
+volumes:
+  - /go/pkg/
+  - /go/bin/
+  - /root/.cache/go-build/
+securityContext:
+  capabilities:
+    add:
+      - SYS_PTRACE
+forward:
+  - 8080:8080
+  - 2345:2345
+# services:
+#   - name: eventstore
+#     image: eventstore/eventstore
+#     environment:
+#       - EVENTSTORE_EXT_IP=0.0.0.0
+#       - EVENTSTORE_EXT_HTTP_PORT=2113
+#       - EVENTSTORE_EXT_TCP_PORT=1113
+#       - EVENTSTORE_EXT_HTTP_PREFIXES=http://*:2113/
+#       - EVENTSTORE_STATS_PERIOD_SEC=600
+#       - EVENTSTORE_ADMIN_ON_EXT=True

@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: watermill-eventstore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: watermill-eventstore
+  template:
+    metadata:
+      labels:
+        app: watermill-eventstore
+    spec:
+      containers:
+        - image: okteto/golang:1
+          name: watermill-eventstore
+          resources:
+            limits:
+              cpu: 0.5
+              memory: 1024Mi
+        - name: eventstore
+          image: eventstore/eventstore
+          resources:
+            limits:
+              cpu: 0.5
+              memory: 1024Mi
+          env:
+            - name: "EVENTSTORE_EXT_IP"
+              value: "0.0.0.0"
+            - name: "EVENTSTORE_EXT_HTTP_PORT"
+              value: "2113"
+            - name: "EVENTSTORE_EXT_TCP_PORT"
+              value: "1113"
+            - name: "EVENTSTORE_EXT_HTTP_PREFIXES"
+              value: "http://*:2113/"
+            - name: "EVENTSTORE_STATS_PERIOD_SEC"
+              value: "600"
+            - name: "EVENTSTORE_ADMIN_ON_EXT"
+              value: "True"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: watermill-eventstore
+  annotations:
+    dev.okteto.com/auto-ingress: "true"
+spec:
+  type: ClusterIP
+  ports:
+    - name: "connection"
+      port: 2113
+  selector:
+    app: watermill-eventstore
